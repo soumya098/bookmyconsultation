@@ -1,5 +1,7 @@
 package com.upgrad.bookmyconsultation.service;
 
+import java.lang.reflect.Array;
+
 import com.upgrad.bookmyconsultation.entity.Address;
 import com.upgrad.bookmyconsultation.entity.Doctor;
 import com.upgrad.bookmyconsultation.enums.Speciality;
@@ -10,9 +12,12 @@ import com.upgrad.bookmyconsultation.repository.AddressRepository;
 import com.upgrad.bookmyconsultation.repository.AppointmentRepository;
 import com.upgrad.bookmyconsultation.repository.DoctorRepository;
 import com.upgrad.bookmyconsultation.util.ValidationUtils;
+
 import lombok.extern.log4j.Log4j2;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import springfox.documentation.annotations.Cacheable;
 
 import java.util.Arrays;
@@ -46,17 +51,32 @@ public class DoctorService {
 	// return the doctor object
 	public Doctor register(Doctor doctor) throws InvalidInputException {
 		ValidationUtils.validate(doctor);
+		if (doctor.getAddress() == null) {
+			throw new InvalidInputException(Arrays.asList("Address"));
+		}
+		doctor.setId(UUID.randomUUID().toString());
+		if (doctor.getSpeciality() == null) {
+			doctor.setSpeciality(Speciality.GENERAL_PHYSICIAN);
+		}
+
+		Address inputAddress = doctor.getAddress();
+    Address address = new Address();
+    address.setId(doctor.getId());
+    address.setAddressLine1(inputAddress.getAddressLine1());
+    address.setAddressLine2(inputAddress.getAddressLine2());
+    address.setCity(inputAddress.getCity());
+    address.setState(inputAddress.getState());
+    address.setPostcode(inputAddress.getPostcode());
+		address.setId(doctor.getId());
+
+		Address addressResponse = addressRepository.save(address);
+		doctor.setAddress(addressResponse);
 		return doctorRepository.save(doctor);
 	}
 
-	// create a method name getDoctor that returns object of type Doctor and has a
-	// String paramter called id
-	// find the doctor by id
-	// if doctor is found return the doctor
-	// else throw ResourceUnAvailableException
 	public Doctor getDoctor(String id) {
 		return doctorRepository.findById(id)
-				.orElseThrow(() -> new ResourceUnAvailableException());
+				.orElseThrow(ResourceUnAvailableException::new);
 	}
 
 	public List<Doctor> getAllDoctorsWithFilters(String speciality) {

@@ -15,9 +15,10 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-@RequiredArgsConstructor
 @Service
+@RequiredArgsConstructor
 public class UserService {
+	@Autowired
 	private final UserRepository userRepository;
 
 	@Autowired
@@ -40,11 +41,13 @@ public class UserService {
 	}
 
 	//create a method named getAllUsers that returns a List of type User
-		//return all the users from the database
+	//return all the users from the database
+	public List<User> getAllUsers() {
+		return userRepository.findAll();
+	}
 	
 
 	private void encryptPassword(final User newUser) {
-
 		String password = newUser.getPassword();
 		final String[] encryptedData = passwordCryptographyProvider.encrypt(password);
 		newUser.setSalt(encryptedData[0]);

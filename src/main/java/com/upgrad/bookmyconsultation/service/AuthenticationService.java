@@ -16,6 +16,8 @@ import com.upgrad.bookmyconsultation.exception.UserErrorCode;
 import com.upgrad.bookmyconsultation.model.AuthorizedUser;
 import com.upgrad.bookmyconsultation.provider.PasswordCryptographyProvider;
 import com.upgrad.bookmyconsultation.repository.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -25,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class AuthenticationService {
 
+	private static final Logger log = LoggerFactory.getLogger(AuthenticationService.class);
 	@Autowired
 	private PasswordCryptographyProvider passwordCryptographyProvider;
 
@@ -40,7 +43,7 @@ public class AuthenticationService {
 
 	@Transactional(propagation = Propagation.REQUIRED)
 	public AuthorizedUser authenticate(final String email, final String password) throws ApplicationException {
-
+    log.info(email);
 		User user = userRepository.findByEmailId(email);
 		if (user == null) throw new AuthenticationFailedException(UserErrorCode.USR_002);
 

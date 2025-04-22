@@ -10,7 +10,7 @@ import com.upgrad.bookmyconsultation.entity.UserAuthToken;
 @Repository
 public interface UserAuthTokenRepository extends CrudRepository<UserAuthToken, Long> {
 
-	UserAuthToken findByUserEmailId(@NotNull String userId);
+	UserAuthToken findFirstByUserEmailIdOrderByLoginAtDesc(@NotNull String userId);
 
 	UserAuthToken findByAccessToken(String token);
 

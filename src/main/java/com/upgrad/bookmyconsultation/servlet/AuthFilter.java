@@ -7,6 +7,8 @@ import com.upgrad.bookmyconsultation.exception.UnauthorizedException;
 import com.upgrad.bookmyconsultation.provider.BearerAuthDecoder;
 import com.upgrad.bookmyconsultation.service.AuthTokenService;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -23,6 +25,7 @@ import static com.upgrad.bookmyconsultation.constants.ResourceConstants.BASIC_AU
 @Component
 public class AuthFilter extends ApiFilter {
 
+	private static final Logger log = LoggerFactory.getLogger(AuthFilter.class);
 	@Autowired
 	private AuthTokenService authTokenService;
 
@@ -35,8 +38,11 @@ public class AuthFilter extends ApiFilter {
 		}
 
 		final String pathInfo = servletRequest.getRequestURI();
-		if (!pathInfo.contains("register") && !pathInfo.contains("actuator") && !pathInfo.contains("doctors")) {
+		log.info("pathinfo: {}",pathInfo);
+
+		if (!pathInfo.contains("register") && !pathInfo.contains("actuator") && !pathInfo.contains("doctors") && !pathInfo.contains("favicon.ico")) {
 			final String authorization = servletRequest.getHeader(HttpHeaders.AUTHORIZATION);
+			log.info("authorization: {}", authorization);
 			if (StringUtils.isEmpty(authorization)) {
 				throw new UnauthorizedException(RestErrorCode.ATH_001);
 			}
